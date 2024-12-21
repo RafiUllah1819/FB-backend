@@ -9,7 +9,14 @@ const port = 5000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+  cors(
+    cors({
+      origin: "https://rafiullah1819.github.io",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    })
+  )
+);
 
 // MongoDB Connection
 const mongoURI = process.env.MONGO_URI;
