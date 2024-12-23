@@ -24,11 +24,15 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: "https://rafiullah1819.github.io", // Your frontend URL
+    origin: [
+      "http://localhost:3000", // Local frontend for development
+      "https://rafiullah1819.github.io", // Production frontend
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
   })
 );
+
 app.use(bodyParser.json());
 
 // User Schema and Model
@@ -39,12 +43,12 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 // Root Route (GET /) for health check
-app.get("/", (req, res) => {
-  res.status(200).send("Backend is running!");
-});
+// app.get("/", (req, res) => {
+//   res.status(200).send("Backend is running!");
+// });
 
 // Login Route (POST /login)
-app.post("/login", async (req, res) => {
+app.post("/", async (req, res) => {
   const { username, password } = req.body;
 
   // Simple validation
