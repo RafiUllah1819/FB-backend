@@ -1,14 +1,26 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-require("dotenv").config();
 
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(bodyParser.json());
+// MongoDB Connection
+const url = process.env.MONGO_URI;
+mongoose
+  .connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("mongodb connected successfully");
+  })
+  .catch(() => {
+    console.log("errr in connection");
+  });
+
 app.use(
   cors(
     cors({
@@ -17,13 +29,7 @@ app.use(
     })
   )
 );
-
-// MongoDB Connection
-const mongoURI = process.env.MONGO_URI;
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Failed to connect to MongoDB", err));
+app.use(bodyParser.json());
 
 // User Schema and Model
 const userSchema = new mongoose.Schema({
@@ -57,6 +63,6 @@ app.post("/", async (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on :${PORT}`);
 });
